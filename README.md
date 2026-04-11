@@ -11,21 +11,21 @@ Think of it like this: if you have a list of 10 items vs 1,000,000 items — how
 
 **O(1) — Constant**
 No matter how big the list, it takes the same time.
-python
-my_list[0]  # Always just grabs the first item
+```python
+my_list[0]  # Always just grabs the first item```
 
 **O(n) — Linear**
 Bigger list = proportionally more time.
-python
+```python
 for item in my_list:  # Loop through every item
-    print(item)
+    print(item)```
 
 **O(n²) — Quadratic**
 A loop inside a loop. Gets slow fast.
-python
+```python
 for i in my_list:
     for j in my_list:  # For every item, loop again
-        print(i, j)
+        print(i, j)```
 
 **O(log n) — Logarithmic**
 Each step cuts the problem in half. Very efficient.
@@ -42,4 +42,11 @@ Binary search is the classic example — you guess the middle, eliminate half, r
 | O(n) | Slows down evenly |
 | O(n²) | Gets painful quickly |
 
-The point isn't to memorize formulas — it's to ask yourself: "if my input doubles, what happens to my code?" That instinct is what interviewers are really testing
+How to write git commit messages
+  feat: new feature
+  fix: bug fix
+  refactor: code restructuring without behavior change
+  docs: documentation updates
+  style: formatting changes
+  test: adding or updating tests
+  chore: maintenance tasks
