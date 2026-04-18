@@ -16,3 +16,19 @@
 
 
 # I have done it with brute force, completed it and submitted it after a pull delete this line
+
+class Solution(object):
+    def findMedianSortedArrays(self, nums1, nums2):
+        list_merge = nums1 + nums2
+        list_sort = sorted(list_merge)
+        list_length = len(list_sort)
+        list_median = list_length // 2
+
+        if list_length % 2 == 1:
+            return list_sort[list_median]
+        else:
+            return (list_sort[list_median - 1] + list_sort[list_median]) / 2.0
+        
+sol = Solution()
+result = sol.findMedianSortedArrays([2,1], [3, 4])
+print(result)
