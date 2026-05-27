@@ -7,11 +7,11 @@
 
 class Solution(object):
     def mySqrt(self, x):
-        if x < 2:
+        if x < 2:   # if no less than 2 we return it
             return x
         
         low = 1
-        high = (x // 2) + 1
+        high = (x // 2) + 1 # we give the hig
         result = 0
 
         while low <= high:
