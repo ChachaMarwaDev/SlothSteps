@@ -2,10 +2,10 @@ April 12 - Solved the work with bruteforce, its now to the new solution.
 
 ### Lists 101
 Lists
-    1. are ordered
-    2. are changeable
-    3. allows duplication
-    4. holds different data type
+1. are ordered
+2. are changeable
+3. allows duplication
+4. holds different data type
     
 > List begin counting at 0 - infinity
 
