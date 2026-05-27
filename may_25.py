@@ -10,8 +10,10 @@ A recursive function has to find how many items we have
 I need to specify the base case and recursive case
 """
 def number_of_items(test_list):
-    for item in test_list:
-        if item == 0:
-            item += 1
-            print(item)
+    # define our base case
+    if len(test_list) == 0:
+        return 0
+    else:
+        return 1 + number_of_items(test_list[1:])
 
+print(number_of_items(test_list))
