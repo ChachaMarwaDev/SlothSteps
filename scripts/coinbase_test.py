@@ -1,0 +1,10 @@
+import os
+from dotenv import load_dotenv
+from coinbase.rest import RESTClient
+
+load_dotenv()
+
+api_key    = os.getenv("COINBASE_API_KEY").strip()
+api_secret = os.getenv("COINBASE_API_SECRET").strip()
+
+client = RESTClient(api_key=api_key, api_secret=api_secret, timeout=5)
