@@ -1,0 +1,268 @@
+
+<style>
+.ds-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 12px; }
+.ds-tag { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; margin-right: 4px; margin-bottom: 6px; }
+.tag-blue { background: #E6F1FB; color: #0C447C; }
+.tag-teal { background: #E1F5EE; color: #085041; }
+.tag-amber { background: #FAEEDA; color: #633806; }
+.tag-purple { background: #EEEDFE; color: #3C3489; }
+.tag-coral { background: #FAECE7; color: #712B13; }
+@media (prefers-color-scheme: dark) {
+  .tag-blue { background: #0C447C; color: #B5D4F4; }
+  .tag-teal { background: #085041; color: #9FE1CB; }
+  .tag-amber { background: #633806; color: #FAC775; }
+  .tag-purple { background: #3C3489; color: #CECBF6; }
+  .tag-coral { background: #712B13; color: #F5C4B3; }
+}
+.ds-title { font-size: 15px; font-weight: 500; margin: 0 0 4px; color: var(--color-text-primary); }
+.ds-subtitle { font-size: 13px; color: var(--color-text-secondary); margin: 0 0 10px; }
+.code-block { background: var(--color-background-tertiary); border-radius: 6px; padding: 10px 12px; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-primary); margin: 8px 0 0; line-height: 1.6; overflow-x: auto; }
+.use-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin: 10px 0 4px; }
+.use-list { font-size: 13px; color: var(--color-text-primary); margin: 0; padding-left: 16px; }
+.use-list li { margin-bottom: 2px; }
+.expand-btn { font-size: 12px; color: var(--color-text-secondary); background: none; border: none; cursor: pointer; padding: 0; margin-top: 6px; }
+.expand-btn:hover { color: var(--color-text-primary); }
+.hidden { display: none; }
+.section-header { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin: 20px 0 8px; }
+.badge-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+</style>
+
+<h2 class="sr-only">Python data structures used in data engineering — reference guide with code examples</h2>
+
+<div style="padding: 0.5rem 0 0">
+
+<div class="section-header">Core — you'll use these every single day</div>
+
+<!-- LIST -->
+<div class="ds-card">
+  <div class="badge-row">
+    <p class="ds-title">List <code>[]</code></p>
+    <span class="ds-tag tag-blue">Ordered</span>
+    <span class="ds-tag tag-blue">Mutable</span>
+    <span class="ds-tag tag-blue">Allows duplicates</span>
+  </div>
+  <p class="ds-subtitle">The workhorse of batch processing. Use whenever you're collecting rows, records, or chunks to process together.</p>
+  <div class="use-label">Where you'll see it</div>
+  <ul class="use-list">
+    <li>Collecting rows from an API before writing to BigQuery</li>
+    <li>Storing partition values to iterate over in Spark</li>
+    <li>Building a batch of records for dlt to ingest</li>
+  </ul>
+  <div class="code-block">
+<span style="color:#888"># dlt pipeline: collecting records to yield</span>
+records = []
+for page in api.paginate("/weather"):
+    records.extend(page["data"])   <span style="color:#888"># list.extend is O(n)</span>
+yield records
+
+<span style="color:#888"># List comprehension — very common in pipelines</span>
+station_ids = [r["id"] for r in records if r["active"]]</div>
+</div>
+
+<!-- DICT -->
+<div class="ds-card">
+  <div class="badge-row">
+    <p class="ds-title">Dictionary <code>{}</code></p>
+    <span class="ds-tag tag-teal">Key-Value</span>
+    <span class="ds-tag tag-teal">O(1) lookup</span>
+    <span class="ds-tag tag-teal">Ordered (3.7+)</span>
+  </div>
+  <p class="ds-subtitle">The shape of a single record — whether it's a JSON API response, a database row, or a Spark schema definition.</p>
+  <div class="use-label">Where you'll see it</div>
+  <ul class="use-list">
+    <li>Every JSON record from an API is a dict</li>
+    <li>dbt source/model config (profiles.yml, dbt_project.yml)</li>
+    <li>Spark schema as a dict when defining StructType dynamically</li>
+    <li>Lookup tables for mapping codes → labels</li>
+  </ul>
+  <div class="code-block">
+<span style="color:#888"># A single weather record</span>
+record = {
+    "station_id": "KE-001",
+    "temp_c": 28.4,
+    "county": "Embu"
+}
+
+<span style="color:#888"># Fast lookup — O(1). No loop needed.</span>
+county_map = {"KE-001": "Embu", "KE-002": "Nairobi"}
+county = county_map.get("KE-001", "Unknown")</div>
+</div>
+
+<!-- SET -->
+<div class="ds-card">
+  <div class="badge-row">
+    <p class="ds-title">Set <code>set()</code></p>
+    <span class="ds-tag tag-amber">No duplicates</span>
+    <span class="ds-tag tag-amber">O(1) membership</span>
+    <span class="ds-tag tag-amber">Unordered</span>
+  </div>
+  <p class="ds-subtitle">Your deduplication tool. Fast to ask "have I seen this before?" without scanning a list.</p>
+  <div class="use-label">Where you'll see it</div>
+  <ul class="use-list">
+    <li>Tracking already-processed record IDs to avoid re-ingesting</li>
+    <li>Deduplicating station IDs from messy source data</li>
+    <li>Finding records present in source but missing from target (set difference)</li>
+  </ul>
+  <div class="code-block">
+<span style="color:#888"># Track what's already been loaded — no list scan needed</span>
+seen_ids = set()
+for record in incoming:
+    if record["id"] not in seen_ids:   <span style="color:#888"># O(1)</span>
+        seen_ids.add(record["id"])
+        yield record
+
+<span style="color:#888"># Set operations — great for reconciliation</span>
+source_ids = {r["id"] for r in source_data}
+target_ids = {r["id"] for r in target_data}
+missing = source_ids - target_ids   <span style="color:#888"># what failed to load?</span></div>
+</div>
+
+<div class="section-header">Pipeline-specific — critical for data engineering</div>
+
+<!-- TUPLE -->
+<div class="ds-card">
+  <div class="badge-row">
+    <p class="ds-title">Tuple <code>()</code></p>
+    <span class="ds-tag tag-purple">Immutable</span>
+    <span class="ds-tag tag-purple">Ordered</span>
+    <span class="ds-tag tag-purple">Hashable</span>
+  </div>
+  <p class="ds-subtitle">Fixed records that shouldn't change. Tuples can be dict keys and set members — lists cannot.</p>
+  <div class="use-label">Where you'll see it</div>
+  <ul class="use-list">
+    <li>Composite keys for deduplication: <code>(county, date, station)</code></li>
+    <li>Returning multiple values from a function cleanly</li>
+    <li>PySpark Row objects behave like tuples</li>
+  </ul>
+  <div class="code-block">
+<span style="color:#888"># Composite key as tuple — usable in a set</span>
+seen = set()
+for r in records:
+    key = (r["station_id"], r["date"])   <span style="color:#888"># tuple = hashable</span>
+    if key not in seen:
+        seen.add(key)
+        yield r
+
+<span style="color:#888"># Multiple return values</span>
+def parse_record(raw):
+    return raw["id"], raw["value"], raw["ts"]
+
+record_id, value, timestamp = parse_record(row)</div>
+</div>
+
+<!-- DEQUE -->
+<div class="ds-card">
+  <div class="badge-row">
+    <p class="ds-title">Deque <code>collections.deque</code></p>
+    <span class="ds-tag tag-coral">O(1) both ends</span>
+    <span class="ds-tag tag-coral">Bounded window</span>
+    <span class="ds-tag tag-coral">Thread-safe</span>
+  </div>
+  <p class="ds-subtitle">A sliding window. Where a list pops from the front in O(n), a deque does it in O(1). Use for rolling averages or bounded queues.</p>
+  <div class="use-label">Where you'll see it</div>
+  <ul class="use-list">
+    <li>Rolling 7-day temperature window for anomaly detection</li>
+    <li>Rate-limited API call buffer (add new, drop old)</li>
+    <li>Task queue in a custom pipeline runner</li>
+  </ul>
+  <div class="code-block">
+from collections import deque
+
+<span style="color:#888"># Sliding 7-day window — maxlen auto-drops oldest</span>
+window = deque(maxlen=7)
+for daily_temp in daily_readings:
+    window.append(daily_temp)
+    if len(window) == 7:
+        rolling_avg = sum(window) / 7</div>
+</div>
+
+<!-- DEFAULTDICT -->
+<div class="ds-card">
+  <div class="badge-row">
+    <p class="ds-title">DefaultDict <code>collections.defaultdict</code></p>
+    <span class="ds-tag tag-blue">Auto-initialise</span>
+    <span class="ds-tag tag-blue">Group-by pattern</span>
+  </div>
+  <p class="ds-subtitle">A dict that creates a default value for missing keys automatically. Eliminates boilerplate when grouping records.</p>
+  <div class="use-label">Where you'll see it</div>
+  <ul class="use-list">
+    <li>Grouping records by county / partition key before bulk insert</li>
+    <li>Counting occurrences without initialising to 0 first</li>
+  </ul>
+  <div class="code-block">
+from collections import defaultdict
+
+<span style="color:#888"># Group records by county — no KeyError, no if-key-in-dict</span>
+by_county = defaultdict(list)
+for record in records:
+    by_county[record["county"]].append(record)
+
+<span style="color:#888"># Counts without initialising</span>
+counts = defaultdict(int)
+for r in records:
+    counts[r["status"]] += 1</div>
+</div>
+
+<div class="section-header">Advanced — shows up in Spark and larger pipelines</div>
+
+<!-- HEAP -->
+<div class="ds-card">
+  <div class="badge-row">
+    <p class="ds-title">Heap <code>heapq</code></p>
+    <span class="ds-tag tag-purple">O(log n) insert</span>
+    <span class="ds-tag tag-purple">O(1) min access</span>
+    <span class="ds-tag tag-purple">Priority queue</span>
+  </div>
+  <p class="ds-subtitle">Always gives you the smallest (or largest) item efficiently. Used when you need top-N records without sorting everything.</p>
+  <div class="use-label">Where you'll see it</div>
+  <ul class="use-list">
+    <li>Top-10 highest risk counties by composite score — no full sort</li>
+    <li>Merge-sort logic inside external sort pipelines (Spark uses this internally)</li>
+    <li>Scheduling retry jobs by next-attempt timestamp</li>
+  </ul>
+  <div class="code-block">
+import heapq
+
+<span style="color:#888"># Top 5 riskiest counties — O(n log k), not O(n log n)</span>
+top5 = heapq.nlargest(5, records, key=lambda r: r["risk_score"])
+
+<span style="color:#888"># Priority queue for retry logic</span>
+retry_queue = []
+heapq.heappush(retry_queue, (next_retry_ts, record))
+ts, next_record = heapq.heappop(retry_queue)</div>
+</div>
+
+<!-- DATACLASS -->
+<div class="ds-card">
+  <div class="badge-row">
+    <p class="ds-title">Dataclass <code>@dataclass</code></p>
+    <span class="ds-tag tag-teal">Typed record</span>
+    <span class="ds-tag tag-teal">Auto-generated methods</span>
+    <span class="ds-tag tag-teal">Self-documenting</span>
+  </div>
+  <p class="ds-subtitle">A class that's just a data container. Replaces messy raw dicts when your records have a defined shape — especially in typed pipelines.</p>
+  <div class="use-label">Where you'll see it</div>
+  <ul class="use-list">
+    <li>Defining a WeatherRecord schema before dlt ingestion</li>
+    <li>Strongly-typed pipeline configs (database URL, batch size, etc.)</li>
+    <li>Anywhere raw dicts get unwieldy and you want autocomplete</li>
+  </ul>
+  <div class="code-block">
+from dataclasses import dataclass
+
+@dataclass
+class WeatherRecord:
+    station_id: str
+    date: str
+    temp_c: float
+    rainfall_mm: float
+
+r = WeatherRecord("KE-001", "2024-06-01", 28.4, 3.2)
+print(r.temp_c)  <span style="color:#888"># 28.4 — no dict["temp_c"] typo risk</span></div>
+</div>
+
+</div>
+
+<div style="margin-top: 16px; padding: 10px 14px; border-radius: 8px; background: var(--color-background-secondary); font-size: 12px; color: var(--color-text-secondary); line-height: 1.6;">
+  <strong style="color: var(--color-text-primary)">Quick rule of thumb:</strong> use a <strong style="color: var(--color-text-primary)">list</strong> for a sequence of rows, a <strong style="color: var(--color-text-primary)">dict</strong> for a single row, a <strong style="color: var(--color-text-primary)">set</strong> for deduplication, a <strong style="color: var(--color-text-primary)">tuple</strong> for a composite key, and a <strong style="color: var(--color-text-primary)">dataclass</strong> when your dict starts having 6+ fields.
+</div>
