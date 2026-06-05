@@ -21,14 +21,16 @@ get_product_book(self, product_id: str, limit: int | None = None, aggregation_pr
 
 get_best_bid_ask(self, product_ids: List[str] | None = None, **kwargs)
 """
-raw = client.get_products(product_type="SPOT", limit=1)
-# data = raw.to_dict()
+# response = client.get_products(product_type="SPOT", limit=1)
+
+raw = client.get_products(product_type="SPOT")
+data = raw.to_dict()
 
 product_info = ["product_id", "price", "price_percentage_change_24h", "base_name", "quote_name", "status", "product_type", "quote_currency_id", "base_currency_id", "price_increment", "high_24h", "low_24h"]
 
 extracted_data = []
 
-for product in raw:
+for product in data['products']:
     if product:
         item = {}
         for field in product_info:
@@ -40,11 +42,6 @@ for product in raw:
 with open("product_spot_info.json", "w") as f:
     json.dump(extracted_data, f, indent=2)
 
-print("File is ready for review")
+print(f"Done — {len(extracted_data)} products written to file")
 # print(data.keys())
-
-# with open("x1.json", "w") as f:
-#     json.dump(data, f, indent=2)
-
-# print("File is saved")
 
