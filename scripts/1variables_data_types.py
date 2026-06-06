@@ -1,7 +1,13 @@
 from dotenv import load_dotenv
 from coinbase.rest import RESTClient
 import os
+import sqlite3
 
+"""
+==========================
+API CONNECTION
+==========================
+"""
 load_dotenv()
 
 api_key    = os.getenv("COINBASE_API_KEY").strip()
@@ -23,4 +29,41 @@ for key, value in data.items():
     if value != "":
         # print the values from the call
         print(f"{key} : {value}")
+        # pass
 
+"""
+==========================
+DATABASE CONNECTION
+==========================
+"""
+db_path = r"../data/test.db"
+con = sqlite3.connect(db_path)
+cur = con.cursor()
+
+# TABLE CREATION
+cur.execute("""
+    CREATE TABLE IF NOT EXISTS products(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id STRING NOT NULL,
+    price INT NOT NULL,
+    price_percentage_change_24h DOUBLE NOT NULL,
+    volume_24h DOUBLE NOT NULL,
+    volume_percentage_change_24h DOUBLE NOT NULL,
+    base_name STRING NOT NULL,
+    quote_name STRING NOT NULL,                
+    status STRING NOT NULL,
+    product_type STRING NOT NULL,
+    approximate_quote_24h_volume DOUBLE NOT NULL,
+    high_24h DOUBLE NOT NULL,
+    low_24h DOUBLE NOT NULL,  
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP                                    
+    )
+""")
+
+print("Table was created successfully")
+# test_result = cur.execute("INSERT INTO product")
+
+
+
+# con.close()
