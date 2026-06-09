@@ -23,25 +23,30 @@ get_best_bid_ask(self, product_ids: List[str] | None = None, **kwargs)
 """
 # response = client.get_products(product_type="SPOT", limit=1)
 
-raw = client.get_products(product_type="SPOT")
+raw = client.get_products()
 data = raw.to_dict()
 
-product_info = ["product_id", "price", "price_percentage_change_24h", "base_name", "quote_name", "status", "product_type", "quote_currency_id", "base_currency_id", "price_increment", "high_24h", "low_24h"]
+print("\n=== Product Types ===")
+for product in data.get('products', []):
+    print(f"{product.get('product_id')} - Type: {product.get('product_type')}")
 
-extracted_data = []
+# product_info = ["product_id", "price", "price_percentage_change_24h", "base_name", "quote_name", "status", "product_type", "quote_currency_id", "base_currency_id", "price_increment", "high_24h", "low_24h"]
 
-for product in data['products']:
-    if product:
-        item = {}
-        for field in product_info:
-            if field in product:
-                item[field] = product[field]
-        extracted_data.append(item)
+# extracted_data = []
 
+# for product in data['products']:
+#     if product:
+#         item = {}
+#         for field in product_info:
+#             if field in product:
+#                 item[field] = product[field]
+#         extracted_data.append(item)
+        
 
-with open("product_spot_info.json", "w") as f:
-    json.dump(extracted_data, f, indent=2)
+# file_name = "full_product_info"
+# with open(f"{file_name}.json", "w") as f:
+#     json.dump(data, f, indent=2)
 
-print(f"Done — {len(extracted_data)} products written to file")
+# print(f"Done — {len(data)} products written to file {file_name}")
 # print(data.keys())
 
