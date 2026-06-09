@@ -51,7 +51,7 @@ def safe_float(value, default=0.0):
     except (ValueError, TypeError):
         return default
 
-db_path = r"../data/products.db"
+db_path = os.getenv("DB_PATH")
 con = sqlite3.connect(db_path)
 cur = con.cursor()
 
