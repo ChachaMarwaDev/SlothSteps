@@ -41,12 +41,45 @@ for product in data['products']:
 DATABASE CONNECTION
 ==========================
 """
-db_path = r"../data/test.db"
+
+def safe_float(value, default=0.0):
+    """Safely convert value to float, handling empty strings and None"""
+    if value is None or value == '':
+        return default
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        return default
+
+db_path = r"../data/products.db"
 con = sqlite3.connect(db_path)
 cur = con.cursor()
 
-# TABLE DATA CREATION
-# After extracting data (lines 39-46), insert all products:
+# TABLE DATA CREATION 
+# spot products
+cur.execute("""
+    CREATE TABLE IF NOT EXISTS spot(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        product_id TEXT NOT NULL,
+        price REAL NOT NULL,
+        price_percentage_change_24h REAL NOT NULL,
+        volume_24h REAL NOT NULL,
+        volume_percentage_change_24h REAL NOT NULL,
+        base_name TEXT NOT NULL,
+        quote_name TEXT NOT NULL,                
+        status TEXT NOT NULL,
+        product_type TEXT NOT NULL,
+        approximate_quote_24h_volume REAL NOT NULL,
+        high_24h REAL NOT NULL,
+        low_24h REAL NOT NULL,  
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP                                    
+    )
+""")
+
+print("Table was created successfully")
+
+# Insert all products using safe_float
 for product in extracted_data:
     cur.execute("""
         INSERT INTO spot(
@@ -57,26 +90,27 @@ for product in extracted_data:
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         product.get('product_id', ''),
-        float(product.get('price', 0)),
-        float(product.get('price_percentage_change_24h', 0)),
-        float(product.get('volume_24h', 0)),
-        float(product.get('volume_percentage_change_24h', 0)),
+        safe_float(product.get('price')),
+        safe_float(product.get('price_percentage_change_24h')),
+        safe_float(product.get('volume_24h')),
+        safe_float(product.get('volume_percentage_change_24h')),
         product.get('base_name', ''),
         product.get('quote_name', ''),
         product.get('status', ''),
         product.get('product_type', ''),
-        float(product.get('approximate_quote_24h_volume', 0)),
-        float(product.get('high_24h', 0)),
-        float(product.get('low_24h', 0))
+        safe_float(product.get('approximate_quote_24h_volume')),
+        safe_float(product.get('high_24h')),
+        safe_float(product.get('low_24h'))
     ))
 
-# Fix the final query:
-cur.execute("SELECT * FROM spot ORDER BY id")  # Use correct table name
-
 con.commit()
-print("\n✓ Data inserted successfully!")
+print(f"\n✓ Data inserted successfully! {len(extracted_data)} products added.")
 
-cur.execute("SELECT * FROM products ORDER BY id")
-row = cur.fetchall()
+# Fix the final query - use correct table name 'spot' not 'products'
+cur.execute("SELECT * FROM spot ORDER BY id LIMIT 5")  # Show first 5 records
+rows = cur.fetchall()
+
+for row in rows:
+    print(row)
 
 con.close()
