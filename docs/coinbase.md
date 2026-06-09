@@ -11,3 +11,7 @@
 
 # print("Saved to product.json")
 ```
+
+to run  `streamlit app` mine is called i.py
+run:```python
+streamlit run i.py```
