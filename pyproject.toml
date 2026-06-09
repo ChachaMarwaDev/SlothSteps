@@ -8,6 +8,7 @@ dependencies = [
     "coinbase>=2.1.0",
     "coinbase-advanced-py>=1.8.3",
     "pandas>=3.0.3",
+    "plotly>=6.8.0",
     "python-dotenv>=1.2.2",
     "streamlit>=1.58.0",
 ]
