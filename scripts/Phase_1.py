@@ -79,7 +79,7 @@ cur.execute("""
 
 print("Table was created successfully")
 
-# Insert all products using safe_float
+# Insert all spot products using safe_float
 for product in extracted_data:
     cur.execute("""
         INSERT INTO spot(
@@ -106,7 +106,7 @@ for product in extracted_data:
 con.commit()
 print(f"\n✓ Data inserted successfully! {len(extracted_data)} products added.")
 
-# Fix the final query - use correct table name 'spot' not 'products'
+
 cur.execute("SELECT * FROM spot ORDER BY id LIMIT 5")  # Show first 5 records
 rows = cur.fetchall()
 
