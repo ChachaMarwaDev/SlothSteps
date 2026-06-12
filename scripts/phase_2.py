@@ -1,3 +1,9 @@
+"""
+-------------------------
+Functions and Scope
+-------------------------
+"""
+
 import os
 from dotenv import load_dotenv
 from coinbase.rest import RESTClient
@@ -11,7 +17,6 @@ client = RESTClient(api_key=api_key, api_secret=api_secret, timeout=5)
 
 raw = client.get_products()
 data = raw.to_dict()
-
 
 # print(data.keys())
 
@@ -58,16 +63,18 @@ def get_price(coin):
         if product['base_currency_id'] == coin:
              return float(product['price'])
 
-print(get_price("ETH"))
-
 # Function 2 — format_price(coin, price)
 # Takes a coin name and a price and returns a nicely readable string.
-
 def format_price(coin, price):
-    name = product['base_currency_id']
-    amount = product['price']
-    for product in all_products:
-        if name == coin :
-             return f"{name}:{amount:.2f}"
+    return (f"{coin}: ${price:,.2f}")
 
-format_price()
+# Function 3 — get_multiple_prices(coins)
+# Takes a list of coin names and returns a dictionary of coin → price.
+def get_multiple_prices(coins:list):
+    result = {}
+    for coin in coins:
+        price = get_price(coin)
+        result[coin] = format_price(coin, price)
+    return result
+
+print(get_multiple_prices(["BTC", "ETH", "SOL"]))
