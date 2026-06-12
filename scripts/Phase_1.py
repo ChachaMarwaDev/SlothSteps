@@ -1,3 +1,8 @@
+"""
+-------------------------
+Variables and Data types
+-------------------------
+"""
 from dotenv import load_dotenv
 from coinbase.rest import RESTClient
 import os
