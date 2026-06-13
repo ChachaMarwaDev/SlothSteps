@@ -15,3 +15,11 @@
 to run  `streamlit app` mine is called i.py
 run:```python
 streamlit run i.py```
+
+Common prefixes used in the industry:
+
+feat: — new feature or new code
+refactor: — restructuring existing code
+fix: — fixing a bug
+add: — adding a new file
+docs: — updating comments or readme
