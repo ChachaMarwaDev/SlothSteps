@@ -16,8 +16,22 @@ class Coinbase:
         self.__data = self.raw.to_dict()
         self.__products = self.__data["products"]
 
-    def get_product(self):
+    def get_products(self):
         return self.__products
+    
+    def get_product(self, coins:list):
+        for product in self.get_products:
+            if product.get("base_currency_id") == coins:
+                return {
+                    "ID":product.get("product_id"),
+                    "Price":product.get("price"),
+                    "High":product.get("high_24h"),
+                    "Low":product.get("low_24h"),
+                    "Price_change %":product.get("price_percentage_change_24h"),
+                    "Volume": product.get("volume_24h"),
+                    "Volume_change %": product.get("volume_percentage_change_24h")
+                }
 
 a = Coinbase(client)
-print(a.get_product())
+print(a.get_product("BTC"))
+
