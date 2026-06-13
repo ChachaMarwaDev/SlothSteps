@@ -23,15 +23,18 @@ class Coinbase:
         for product in self.get_products():
             if product.get("base_currency_id") == coins:
                 return {
-                    "ID":product.get("product_id"),
-                    "Price":product.get("price"),
-                    "High":product.get("high_24h"),
-                    "Low":product.get("low_24h"),
-                    "Price_change %":product.get("price_percentage_change_24h"),
-                    "Volume": product.get("volume_24h"),
-                    "Volume_change %": product.get("volume_percentage_change_24h")
+                    "ID":               product.get("product_id"),
+                    "Price":            float(product.get("price", 0)),
+                    "High":             float(product.get("high_24h", 0)),
+                    "Low":              float(product.get("low_24h", 0)),
+                    "Price_change %":   float(product.get("price_percentage_change_24h", 0)),
+                    "Volume":           float(product.get("volume_24h", 0)),
+                    "Volume_change %":  float(product.get("volume_percentage_change_24h", 0))
                 }
+        return None
 
 a = Coinbase(client)
-print(a.get_product("BTC"))
+result = a.get_product("BTC")
 
+for key, value in result.items():
+    print(f"{key}:{value}")
