@@ -19,8 +19,8 @@ class Coinbase:
     def get_products(self):
         return self.__products
     
-    def get_product(self, coins:list):
-        for product in self.get_products:
+    def get_product(self, coins:str):
+        for product in self.get_products():
             if product.get("base_currency_id") == coins:
                 return {
                     "ID":product.get("product_id"),
