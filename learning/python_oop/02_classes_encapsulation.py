@@ -1,6 +1,7 @@
 # Classes Encapsulation
 import os
 import csv
+import sqlite3
 from dotenv import load_dotenv
 from coinbase.rest import RESTClient
 from datetime import datetime
@@ -49,10 +50,68 @@ class Coinbase:
                         file_exists = True
                     writer.writerow(data)
         return "All work done"
+    
+    def create_table(self):
+        conn = sqlite3.connect("prices.db")
+        cursor = conn.cursor()
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS prices
+            (id INTEGER PRIMARY KEY AUTOINCREMENT,
+            product_id TEXT NOT NULL,
+            price REAL NOT NULL,
+            high REAL NOT NULL,
+            low REAL NOT NULL,
+            price_change_pct REAL NOT NULL,
+            volume REAL NOT NULL,
+            volume_change_pct REAL NOT NULL,
+            timestamp TEXT NOT NULL)
+        """)
+        conn.commit()
+        conn.close()
+
+    def insert_prices(self, coins: list):
+        conn = sqlite3.connect("prices.db")
+        cursor = conn.cursor()
+        for coin in coins:
+            data=self.get_product(coin)
+            if data:
+                cursor.execute("""
+                INSERT INTO prices 
+                    (product_id, price, high, low, price_change_pct, volume, volume_change_pct, timestamp)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                data["ID"],
+                data["Price"],
+                data["High"],
+                data["Low"],
+                data["Price_change %"],
+                data["Volume"],
+                data["Volume_change %"],
+                data["Timestamp"]))
+        conn.commit()
+        conn.close()
+
+    def get_history(self, coin: str):
+        conn = sqlite3.connect("prices.db")
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT * FROM prices
+            WHERE product_id = ?
+        """, (coin + "-USD",))  # ← what goes here?
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
 
 a = Coinbase(client)
-# result = a.get_product("SOL")
-result = a.save_prices(["SOL", "BTC", "ETH", "WLD"])
+for row in a.get_history("BTC"):
+    print(row)
+# a.create_table()
+# a.insert_prices(["BTC", "ETH", "SOL", "WLD"])
 
-# for key, value in result.items():
-#     print(f"{key}:{value}")
+
+# conn = sqlite3.connect("prices.db")
+# cursor = conn.cursor()
+# cursor.execute("SELECT * FROM prices")
+# for row in cursor.fetchall():
+#     print(row)
+# conn.close()
