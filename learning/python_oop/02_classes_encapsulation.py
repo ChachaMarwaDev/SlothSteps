@@ -1,10 +1,11 @@
 # Classes Encapsulation
 import os
+import csv
 from dotenv import load_dotenv
 from coinbase.rest import RESTClient
+from datetime import datetime
 
 load_dotenv()
-
 api_key    = os.getenv("COINBASE_API_KEY").strip()
 api_secret = os.getenv("COINBASE_API_SECRET").strip()
 
@@ -30,12 +31,28 @@ class Coinbase:
                     "Low":              float(product.get("low_24h", 0)),
                     "Price_change %":   float(product.get("price_percentage_change_24h", 0)),
                     "Volume":           float(product.get("volume_24h", 0)),
-                    "Volume_change %":  float(product.get("volume_percentage_change_24h", 0))
+                    "Volume_change %":  float(product.get("volume_percentage_change_24h", 0)),
+                    "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
         return None
+    
+    def save_prices(self, coins:list):
+        file_exists = os.path.exists("Solana_prices.csv")
+
+        with open('Solana_prices.csv', 'a', newline='') as csvfile:
+            for coin in coins:
+                data = self.get_product(coin)
+                if data:
+                    writer = csv.DictWriter(csvfile, fieldnames=data.keys())
+                    if not file_exists:
+                        writer.writeheader()
+                        file_exists = True
+                    writer.writerow(data)
+        return "All work done"
 
 a = Coinbase(client)
-result = a.get_product("SOL")
+# result = a.get_product("SOL")
+result = a.save_prices(["SOL", "BTC", "ETH", "WLD"])
 
-for key, value in result.items():
-    print(f"{key}:{value}")
+# for key, value in result.items():
+#     print(f"{key}:{value}")
