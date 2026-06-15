@@ -16,11 +16,12 @@ class Coinbase:
         self.__data = self.raw.to_dict()
         self.__products = self.__data["products"]
 
+    @property
     def get_products(self):
         return self.__products
     
     def get_product(self, coins:str):
-        for product in self.get_products():
+        for product in self.get_products:
             if product.get("base_currency_id") == coins:
                 return {
                     "ID":               product.get("product_id"),
@@ -34,7 +35,7 @@ class Coinbase:
         return None
 
 a = Coinbase(client)
-result = a.get_product("BTC")
+result = a.get_product("SOL")
 
 for key, value in result.items():
     print(f"{key}:{value}")
